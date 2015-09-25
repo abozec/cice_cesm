@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4
+END
+CICE.F90
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/CICE.F90
+END
+ice_restart.F90
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/ice_restart.F90
+END
+CICE_ComponentMod.F90
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/CICE_ComponentMod.F90
+END
+CICE_InitMod.F90
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/CICE_InitMod.F90
+END
+CICE_RunMod.F90
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/CICE_RunMod.F90
+END
+ice_history_write.F90
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/ice_history_write.F90
+END
+CICE_FinalMod.F90
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/CICE_FinalMod.F90
+END
+ice_constants.F90
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/drivers/cice4/ice_constants.F90
+END

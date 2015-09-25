@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld
+END
+cice.buildexe.csh
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/cice.buildexe.csh
+END
+check_decomp.csh
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/check_decomp.csh
+END
+cice.cpl7.template
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/cice.cpl7.template
+END
+configure
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/configure
+END
+cice.buildnml.csh
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/cice.buildnml.csh
+END
+build-namelist
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/build-namelist
+END
+cice_decomp.xml
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/cice_decomp.xml
+END
+check_decomp.out
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/check_decomp.out
+END
+user_nl_cice
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/user_nl_cice
+END
+generate_cice_decomp.pl
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/bld/generate_cice_decomp.pl
+END

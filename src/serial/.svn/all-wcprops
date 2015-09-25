@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial
+END
+ice_broadcast.F90
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_broadcast.F90
+END
+ice_boundary.F90
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_boundary.F90
+END
+ice_timers.F90
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_timers.F90
+END
+ice_communicate.F90
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_communicate.F90
+END
+ice_exit.F90
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_exit.F90
+END
+ice_gather_scatter.F90
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_gather_scatter.F90
+END
+ice_global_reductions.F90
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/!svn/ver/69093/cice/branch_tags/cesm1_3_nuopc01_tags/nuopc01_16_cice4_0_20131002/src/serial/ice_global_reductions.F90
+END
