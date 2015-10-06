@@ -264,8 +264,10 @@
       ! variables related to optional bug checks
 
       logical (kind=log_kind), parameter ::     &
-         l_conservation_check = .true. ,&! if true, check conservation
-         l_monotonicity_check = .true.   ! if true, check monotonicity
+!!Alex         l_conservation_check = .true. ,&! if true, check conservation
+!!Alex         l_monotonicity_check = .true.   ! if true, check monotonicity
+         l_conservation_check = .false. ,&! if true, check conservation
+         l_monotonicity_check = .false.   ! if true, check monotonicity
 
       real (kind=dbl_kind), dimension(0:ncat) ::     &
          asum_init      ,&! initial global ice area

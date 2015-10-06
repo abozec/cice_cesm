@@ -1,12 +1,12 @@
 #!/bin/csh
 
-set res = (gx3v7 gx1v6 tx0.1v2 ne240np4)
-set pe1 = (1 1 1 1)
-set pex = (500 4000 60000 60000)
+set res = (gx3v7 gx1v6 tx0.1v2 ne240np4 gh72)
+set pe1 = (1 1 1 1 1)
+set pex = (500 4000 60000 60000 )
 
 foreach grid (1 2 3 4)
 
-foreach thrd (1 4)
+foreach thrd (1 4 )
 
 set n = $pe1[$grid]
 echo " "

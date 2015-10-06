@@ -678,7 +678,7 @@
       call t_startf ('cice_evp_tpupd')
 
       ! Force symmetry across the tripole seam
-      if (trim(grid_type) == 'tripole') then
+      if (trim(grid_type) == 'tripole' .or. trim(grid_type) == 'hycom') then
       if (maskhalo_stress) then
          !-------------------------------------------------------
          ! set halomask to zero because ice_HaloMask always keeps

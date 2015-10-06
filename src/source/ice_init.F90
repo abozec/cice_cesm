@@ -768,7 +768,8 @@
              grid_type  /=  'column'         .and. &
              grid_type  /=  'rectangular'    .and. &
              grid_type  /=  'panarctic'      .and. &
-             grid_type  /=  'latlon' ) then 
+             grid_type  /=  'latlon'         .and. &
+             grid_type  /=  'hycom' ) then   
             call abort_ice('ice_init: unknown grid_type')
          endif
 

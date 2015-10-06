@@ -64,9 +64,9 @@ require Decomp::Config;
 
 #-----------------------------------------------------------------------------------------------
 my $output = "all";
-my $res = "gx1v6";
-my $nx  = 320;
-my $ny  = 384;
+my $res = "gh72";
+my $nx  = 500;
+my $ny  = 381;
 
 sub usage {
     die <<EOF;

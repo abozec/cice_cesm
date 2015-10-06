@@ -24,7 +24,7 @@ Mode of cice
 Type of cice decomposition.
 </entry>
 
-<entry id="hgrid" value="gx1v5">
+<entry id="hgrid" value="gh72,gx1v6">
 Horizontal grid specifier.  
 </entry>
 

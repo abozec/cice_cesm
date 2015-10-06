@@ -190,7 +190,7 @@
       allocate(work_g2(nx_global,ny_global))
 
       if (trim(grid_type) == 'displaced_pole' .or. &
-          trim(grid_type) == 'tripole'      ) then
+          trim(grid_type) == 'tripole' .or. trim(grid_type) == 'hycom'      ) then
 
          if (trim(grid_format) == 'nc') then
 
@@ -331,6 +331,8 @@
          else
             call popgrid        ! read POP grid lengths directly
          endif 
+      elseif (trim(grid_type) == 'hycom') then
+            call hycomgrid      ! read HYCOM grid  
       elseif (trim(grid_type) == 'panarctic') then
          call panarctic_grid    ! pan-Arctic grid
 #ifdef CCSMCOUPLED
@@ -426,55 +428,59 @@
       ! Calculate ANGLET to be compatible with POP ocean model
       ! First, ensure that -pi <= ANGLE <= pi
       !-----------------------------------------------------------------
-
-      out_of_range = .false.
-      where (ANGLE < -pi .or. ANGLE > pi) out_of_range = .true.
-      if (count(out_of_range) > 0) then
-         call abort_ice ('ice: init_grid: ANGLE out of expected range')
-      endif
+     
+      if (trim(grid_type) == 'hycom') then 
+!       hycomgrid input includes ANGLET
+      else
+        out_of_range = .false.
+        where (ANGLE < -pi .or. ANGLE > pi) out_of_range = .true.
+        if (count(out_of_range) > 0) then
+          call abort_ice ('ice: init_grid: ANGLE out of expected range')
+        endif
 
       !-----------------------------------------------------------------
       ! Compute ANGLE on T-grid
       !-----------------------------------------------------------------
-      ANGLET = c0
+        ANGLET = c0
 
-      !$OMP PARALLEL DO PRIVATE(iblk,this_block,ilo,ihi,jlo,jhi,i,j,&
-      !$OMP                     angle_0,angle_w,angle_s,angle_sw)
-      do iblk = 1, nblocks
-         this_block = get_block(blocks_ice(iblk),iblk)         
-         ilo = this_block%ilo
-         ihi = this_block%ihi
-         jlo = this_block%jlo
-         jhi = this_block%jhi
+        !$OMP PARALLEL DO PRIVATE(iblk,this_block,ilo,ihi,jlo,jhi,i,j,&
+        !$OMP                     angle_0,angle_w,angle_s,angle_sw)
+        do iblk = 1, nblocks
+          this_block = get_block(blocks_ice(iblk),iblk)         
+          ilo = this_block%ilo
+          ihi = this_block%ihi
+          jlo = this_block%jlo
+          jhi = this_block%jhi
 
-         do j = jlo, jhi
-         do i = ilo, ihi
-            angle_0  = ANGLE(i  ,j  ,iblk) !   w----0
-            angle_w  = ANGLE(i-1,j  ,iblk) !   |    |
-            angle_s  = ANGLE(i,  j-1,iblk) !   |    |
-            angle_sw = ANGLE(i-1,j-1,iblk) !   sw---s
+          do j = jlo, jhi
+          do i = ilo, ihi
+             angle_0  = ANGLE(i  ,j  ,iblk) !   w----0
+             angle_w  = ANGLE(i-1,j  ,iblk) !   |    |
+             angle_s  = ANGLE(i,  j-1,iblk) !   |    |
+             angle_sw = ANGLE(i-1,j-1,iblk) !   sw---s
 
-            if ( angle_0 < c0 ) then
-               if ( abs(angle_w - angle_0) > pi) &
-                        angle_w = angle_w  - pi2
-               if ( abs(angle_s - angle_0) > pi) &
-                        angle_s = angle_s  - pi2
-               if ( abs(angle_sw - angle_0) > pi) &
-                        angle_sw = angle_sw - pi2
-            endif
+             if ( angle_0 < c0 ) then
+                if ( abs(angle_w - angle_0) > pi) &
+                         angle_w = angle_w  - pi2
+                if ( abs(angle_s - angle_0) > pi) &
+                         angle_s = angle_s  - pi2
+                if ( abs(angle_sw - angle_0) > pi) &
+                         angle_sw = angle_sw - pi2
+             endif
 
-            ANGLET(i,j,iblk) = angle_0 * p25 + angle_w * p25 &
+             ANGLET(i,j,iblk) = angle_0 * p25 + angle_w * p25 &
                              + angle_s * p25 + angle_sw* p25
-         enddo
-         enddo
-      enddo
-      !$OMP END PARALLEL DO
+          enddo
+          enddo
+        enddo
+        !$OMP END PARALLEL DO
       
-      call ice_timer_start(timer_bound)
-      call ice_HaloUpdate (ANGLET,           halo_info, &
-                           field_loc_center, field_type_angle, &
-                           fillValue=c1)
-      call ice_timer_stop(timer_bound)
+        call ice_timer_start(timer_bound)
+        call ice_HaloUpdate (ANGLET,           halo_info, &
+                             field_loc_center, field_type_angle, &
+                             fillValue=c1)
+        call ice_timer_stop(timer_bound)
+      endif  !  grid_type 
 
       call makemask          ! velocity mask, hemisphere masks
 
@@ -636,6 +642,147 @@
       endif
 
       end subroutine popgrid
+!=======================================================================
+!BOP
+!
+! !IROUTINE: hycomgrid - read and set HYCOM tripolar 
+!                        grid and land mask
+!
+! !INTERFACE:
+!
+      subroutine hycomgrid
+!
+! !DESCRIPTION:
+!
+! HYCOM tripolar grid and land mask. 
+! Grid record number, field and units are: \\
+! (1) ULAT  (radians)    \\
+! (2) ULON  (radians)    \\
+! (3) HTN   (cm)         \\
+! (4) HTE   (cm)         \\
+! (5) HUS   (cm)         \\
+! (6) HUW   (cm)         \\
+! (7) ANGLET (radians)   \\
+! (8) TLAT  (radians)    \\
+! (9) TLON  (radians)    
+!
+! Land mask record number and field is (1) KMT.
+!
+! !REVISION HISTORY:
+!
+! author: Alexandra Bozec, COAPS/FSU 2015  (based on popgrid)
+!
+! !USES:
+!
+      use ice_work, only: work_g1
+!
+! !INPUT/OUTPUT PARAMETERS:
+!
+!
+!EOP
+!
+      integer (kind=int_kind) :: &
+         i, j, iblk, &
+         ilo,ihi,jlo,jhi      ! beginning and end of physical domain
+
+      logical (kind=log_kind) :: diag
+
+      type (block) :: &
+         this_block           ! block information for current block
+
+      call ice_open(nu_grid,grid_file,64)
+      call ice_open(nu_kmt,kmt_file,32)
+
+      diag = .true.       ! write diagnostic info
+
+      !-----------------------------------------------------------------
+      ! topography
+      !-----------------------------------------------------------------
+      call ice_read(nu_kmt,1,work1,'ida4',diag, &
+                    field_loc=field_loc_center, &
+                    field_type=field_type_scalar)
+
+
+      hm(:,:,:) = c0
+      bm(:,:,:) = c0
+      !$OMP PARALLEL DO PRIVATE(iblk,this_block,ilo,ihi,jlo,jhi,i,j)
+      do iblk = 1, nblocks
+         this_block = get_block(blocks_ice(iblk),iblk)
+         ilo = this_block%ilo
+         ihi = this_block%ihi
+         jlo = this_block%jlo
+         jhi = this_block%jhi
+
+         do j = jlo, jhi
+         do i = ilo, ihi
+            hm(i,j,iblk) = work1(i,j,iblk)
+            if (hm(i,j,iblk) >= c1) hm(i,j,iblk) = c1
+            bm(i,j,iblk) = my_task + iblk/1000.0_dbl_kind
+         enddo
+         enddo
+      enddo
+      !$OMP END PARALLEL DO
+
+      !-----------------------------------------------------------------
+      ! lat, lon, angle
+      !-----------------------------------------------------------------
+
+      if (my_task == master_task) then
+         allocate(work_g1(nx_global,ny_global))
+      else
+         allocate(work_g1(1,1))
+      endif
+
+      call ice_read_global(nu_grid,1,work_g1,'rda8',.true.)   ! ULAT
+      call gridbox_verts(work_g1,latt_bounds)
+      call scatter_global(ULAT, work_g1, master_task, distrb_info, &
+                          field_loc_NEcorner, field_type_scalar)
+      call ice_HaloExtrapolate(ULAT, distrb_info, &
+                               ew_boundary_type, ns_boundary_type)
+
+      call ice_read_global(nu_grid,2,work_g1,'rda8',.true.)   ! ULON
+      call gridbox_verts(work_g1,lont_bounds)
+      call scatter_global(ULON, work_g1, master_task, distrb_info, &
+                          field_loc_NEcorner, field_type_scalar)
+      call ice_HaloExtrapolate(ULON, distrb_info, &
+                               ew_boundary_type, ns_boundary_type)
+
+      call ice_read_global(nu_grid,7,work_g1,'rda8',.true.)   ! ANGLET
+      call scatter_global(ANGLET, work_g1, master_task, distrb_info, &
+                          field_loc_center, field_type_angle)
+
+      call ice_read_global(nu_grid,8,work_g1,'rda8',.true.)   ! TLAT
+      call scatter_global(TLAT, work_g1, master_task, distrb_info, &
+                          field_loc_center, field_type_scalar)
+      call ice_HaloExtrapolate(TLAT, distrb_info, &
+                               ew_boundary_type, ns_boundary_type)
+
+      call ice_read_global(nu_grid,9,work_g1,'rda8',.true.)   ! TLON
+      call scatter_global(TLON, work_g1, master_task, distrb_info, &
+                          field_loc_center, field_type_scalar)
+      call ice_HaloExtrapolate(TLON, distrb_info, &
+                               ew_boundary_type, ns_boundary_type)
+
+      !-----------------------------------------------------------------
+      ! cell dimensions
+      ! calculate derived quantities from global arrays to preserve 
+      ! information on boundaries
+      !-----------------------------------------------------------------
+
+      call ice_read_global(nu_grid,3,work_g1,'rda8',.true.)   ! HTN
+      call primary_grid_lengths_HTN(work_g1)                  ! dxu, dxt
+
+      call ice_read_global(nu_grid,4,work_g1,'rda8',.true.)   ! HTE
+      call primary_grid_lengths_HTE(work_g1)                  ! dyu, dyt
+
+      deallocate(work_g1)
+
+      if (my_task == master_task) then
+         close (nu_grid)
+!         close (nu_kmt)
+      endif
+
+      end subroutine hycomgrid
 
 !=======================================================================
 !BOP
@@ -1691,73 +1838,77 @@
       type (block) :: &
            this_block           ! block information for current block
 
-      TLAT(:,:,:) = c0
-      TLON(:,:,:) = c0
 
-      !$OMP PARALLEL DO PRIVATE(iblk,this_block,ilo,ihi,jlo,jhi,i,j, &
-      !$OMP                    z1,x1,y1,z2,x2,y2,z3,x3,y3,z4,x4,y4, &
-      !$OMP                     tx,ty,tz,da)
-      do iblk = 1, nblocks
-         this_block = get_block(blocks_ice(iblk),iblk)         
-         ilo = this_block%ilo
-         ihi = this_block%ihi
-         jlo = this_block%jlo
-         jhi = this_block%jhi
+      if (grid_type /= 'hycom') then !! TLAT and TLON already defined by hycomgrid
 
-         do j = jlo, jhi
-         do i = ilo, ihi
+        TLAT(:,:,:) = c0
+        TLON(:,:,:) = c0
 
-            z1 = cos(ULAT(i-1,j-1,iblk))
-            x1 = cos(ULON(i-1,j-1,iblk))*z1
-            y1 = sin(ULON(i-1,j-1,iblk))*z1
-            z1 = sin(ULAT(i-1,j-1,iblk))
+        !$OMP PARALLEL DO PRIVATE(iblk,this_block,ilo,ihi,jlo,jhi,i,j, &
+        !$OMP                    z1,x1,y1,z2,x2,y2,z3,x3,y3,z4,x4,y4, &
+        !$OMP                     tx,ty,tz,da)
+        do iblk = 1, nblocks
+          this_block = get_block(blocks_ice(iblk),iblk)         
+          ilo = this_block%ilo
+          ihi = this_block%ihi
+          jlo = this_block%jlo
+          jhi = this_block%jhi
 
-            z2 = cos(ULAT(i,j-1,iblk))
-            x2 = cos(ULON(i,j-1,iblk))*z2
-            y2 = sin(ULON(i,j-1,iblk))*z2
-            z2 = sin(ULAT(i,j-1,iblk))
+          do j = jlo, jhi
+          do i = ilo, ihi
 
-            z3 = cos(ULAT(i-1,j,iblk))
-            x3 = cos(ULON(i-1,j,iblk))*z3
-            y3 = sin(ULON(i-1,j,iblk))*z3
-            z3 = sin(ULAT(i-1,j,iblk))
+             z1 = cos(ULAT(i-1,j-1,iblk))
+             x1 = cos(ULON(i-1,j-1,iblk))*z1
+             y1 = sin(ULON(i-1,j-1,iblk))*z1
+             z1 = sin(ULAT(i-1,j-1,iblk))
 
-            z4 = cos(ULAT(i,j,iblk))
-            x4 = cos(ULON(i,j,iblk))*z4
-            y4 = sin(ULON(i,j,iblk))*z4
-            z4 = sin(ULAT(i,j,iblk))
+             z2 = cos(ULAT(i,j-1,iblk))
+             x2 = cos(ULON(i,j-1,iblk))*z2
+             y2 = sin(ULON(i,j-1,iblk))*z2
+             z2 = sin(ULAT(i,j-1,iblk))
 
-            tx = (x1+x2+x3+x4)/c4
-            ty = (y1+y2+y3+y4)/c4
-            tz = (z1+z2+z3+z4)/c4
-            da = sqrt(tx**2+ty**2+tz**2)
+             z3 = cos(ULAT(i-1,j,iblk))
+             x3 = cos(ULON(i-1,j,iblk))*z3
+             y3 = sin(ULON(i-1,j,iblk))*z3
+             z3 = sin(ULAT(i-1,j,iblk))
 
-            tz = tz/da
+             z4 = cos(ULAT(i,j,iblk))
+             x4 = cos(ULON(i,j,iblk))*z4
+             y4 = sin(ULON(i,j,iblk))*z4
+             z4 = sin(ULAT(i,j,iblk))
 
-            ! TLON in radians East
-            TLON(i,j,iblk) = c0
-            if (tx /= c0 .or. ty /= c0) TLON(i,j,iblk) = atan2(ty,tx)
+             tx = (x1+x2+x3+x4)/c4
+             ty = (y1+y2+y3+y4)/c4
+             tz = (z1+z2+z3+z4)/c4
+             da = sqrt(tx**2+ty**2+tz**2)
 
-            ! TLAT in radians North
-            TLAT(i,j,iblk) = asin(tz)
+             tz = tz/da
+
+             ! TLON in radians East
+             TLON(i,j,iblk) = c0
+             if (tx /= c0 .or. ty /= c0) TLON(i,j,iblk) = atan2(ty,tx)
+
+             ! TLAT in radians North
+             TLAT(i,j,iblk) = asin(tz)
             
-         enddo                  ! i
-         enddo                  ! j         
-      enddo                     ! iblk
-      !$OMP END PARALLEL DO
+          enddo                  ! i
+          enddo                  ! j         
+        enddo                     ! iblk
+        !$OMP END PARALLEL DO
 
-      call ice_timer_start(timer_bound)
-      call ice_HaloUpdate (TLON,             halo_info, &
-                           field_loc_center, field_type_scalar, &
-                           fillValue=c1)
-      call ice_HaloUpdate (TLAT,             halo_info, &
-                           field_loc_center, field_type_scalar, &
-                           fillValue=c1)
-      call ice_HaloExtrapolate(TLON, distrb_info, &
-                               ew_boundary_type, ns_boundary_type)
-      call ice_HaloExtrapolate(TLAT, distrb_info, &
-                               ew_boundary_type, ns_boundary_type)
-      call ice_timer_stop(timer_bound)
+        call ice_timer_start(timer_bound)
+        call ice_HaloUpdate (TLON,             halo_info, &
+                             field_loc_center, field_type_scalar, &
+                             fillValue=c1)
+        call ice_HaloUpdate (TLAT,             halo_info, &
+                             field_loc_center, field_type_scalar, &
+                             fillValue=c1)
+        call ice_HaloExtrapolate(TLON, distrb_info, &
+                                 ew_boundary_type, ns_boundary_type)
+        call ice_HaloExtrapolate(TLAT, distrb_info, &
+                                 ew_boundary_type, ns_boundary_type)
+        call ice_timer_stop(timer_bound)
+      endif ! .not. hycom
 
       x1 = global_minval(TLON, distrb_info, tmask)
       x2 = global_maxval(TLON, distrb_info, tmask)
