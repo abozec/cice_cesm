@@ -1315,7 +1315,7 @@
 
       ! Special halo updates for tripole grid
 
-      if (trim(grid_type) == 'tripole') then
+      if (trim(grid_type) == 'tripole' .or. trim(grid_type) == 'hycom' ) then
 
       call ice_HaloUpdate_stress(stressp_1, stressp_3, halo_info, &
                            field_loc_center,  field_type_scalar)
