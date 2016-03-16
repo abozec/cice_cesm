@@ -432,7 +432,16 @@ contains
                 i2x(index_i2x_Faii_swnet,n)   = fswabs(i,j,iblk)
 
                 !--- i/o fluxes computed by ice
+#ifdef OCN_HYCOM
+                !--- use positive part of frzmlt for HYCOM (i.e. freezing flux)
+                if (frzmlt(i,j,iblk) > c0 ) then
+                i2x(index_i2x_Fioi_melth,n)   = frzmlt(i,j,iblk)
+                else
                 i2x(index_i2x_Fioi_melth,n)   = fhocn(i,j,iblk)
+                endif
+#else
+                i2x(index_i2x_Fioi_melth,n)   = fhocn(i,j,iblk)
+#endif
                 i2x(index_i2x_Fioi_swpen,n)   = fswthru(i,j,iblk) ! hf from melting          
                 i2x(index_i2x_Fioi_meltw,n)   = fresh(i,j,iblk)   ! h2o flux from melting    ???
                 i2x(index_i2x_Fioi_salt ,n)   = fsalt(i,j,iblk)   ! salt flux from melting   ???

@@ -76,6 +76,7 @@ OPTIONS
      -hgrid <name>       Specify horizontal grid.  Use nlatxnlon for spectral grids;
                          dlatxdlon for fv grids (dlat and dlon are the grid cell size
 			 in degrees for latitude and longitude respectively); 
+     -ocomp <name>       Specify ocean component COMP_OCN.
      -nx <number>        Number of longitudes
      -ny <number>        Number of latitudes
      -ntasks <n>         Number of MPI tasks.  
@@ -131,6 +132,7 @@ GetOptions(
     "decomptype=s"              => \$opts{'decomptype'},
     "h|help"                    => \$opts{'help'},
     "hgrid=s"                   => \$opts{'hgrid'},
+    "ocomp=s"                   => \$opts{'ocomp'},
     "nx=i"                      => \$opts{'nx'},
     "ny=i"                      => \$opts{'ny'},
     "ntr_aero=s"                => \$opts{'ntr_aero'},
@@ -334,6 +336,14 @@ if ($print>=2) { print "cice : nlon         is $nlon      $eol";}
 if ($print>=2) { print "cice : nlat         is $nlat      $eol";}
 
 #-----------------------------------------------------------------------------------------------
+# Ocean Component ##Alex
+my $ocomp;
+if (defined $opts{'ocomp'}) {
+     $ocomp = $opts{'ocomp'};
+}
+if ($print>=2) {print "Ocean Component: $ocomp $eol" ;}
+
+#-----------------------------------------------------------------------------------------------
 # If the cice decomposition is not to be specified, then set the cpp variables and stop
 
 my $ntr_aero = $cfg_ref->get('ntr_aero');
@@ -344,7 +354,12 @@ if ($ntr_aero gt "6"){
 EOF
 }
 
-my $cice_cppdefs = " -DCCSMCOUPLED -Dcoupled -Dncdf -DNCAT=$ncat -DNXGLOB=$nlon -DNYGLOB=$nlat -DNTR_AERO=$ntr_aero";
+my $cice_cppdefs;
+if ($ocomp eq "hycom"){
+ $cice_cppdefs = " -DCCSMCOUPLED -DOCN_HYCOM -Dncdf -DNCAT=$ncat -DNXGLOB=$nlon -DNYGLOB=$nlat -DNTR_AERO=$ntr_aero";
+} else {
+ $cice_cppdefs = " -DCCSMCOUPLED -Dcoupled -Dncdf -DNCAT=$ncat -DNXGLOB=$nlon -DNYGLOB=$nlat -DNTR_AERO=$ntr_aero";
+}
 
 #-----------------------------------------------------------------------------------------------
 # Determine if will set the cice decomposition

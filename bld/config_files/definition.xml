@@ -24,8 +24,12 @@ Mode of cice
 Type of cice decomposition.
 </entry>
 
-<entry id="hgrid" value="gh72,gx1v6">
+<entry id="hgrid" value="gx1v6">
 Horizontal grid specifier.  
+</entry>
+
+<entry id="ocomp" value="pop2">
+Ocean Component
 </entry>
 
 <entry id="nlon" value="1">

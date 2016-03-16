@@ -65,8 +65,12 @@
          dragio = 0.00536_dbl_kind                ,&! ice-ocn drag coefficient
 !        rho_air   = SHR_CONST_RHODAIR,&! ambient air density (kg/m^3)
          spval_dbl = SHR_CONST_SPVAL  ,&! special value
+#ifdef OCN_HYCOM
+         snowpatch = 0.02_dbl_kind      ! parameter for fractional snow area (m)
+#else
          snowpatch = 0.005_dbl_kind     ! parameter for fractional snow area (m)
-
+#endif
+         
       real (kind=real_kind), parameter :: &
          spval     = 1.0e30_real_kind   ! special value for netCDF output
 

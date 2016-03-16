@@ -4,7 +4,7 @@ if !(-d $CASEBUILD/ciceconf) mkdir -p $CASEBUILD/ciceconf
 
 # Invoke cice configure - output will go in $CASEBUILD/ciceconf 
 cd $CASEBUILD/ciceconf || exit -1
-$CODEROOT/ice/cice/bld/configure -hgrid $ICE_GRID -nx $ICE_NX -ny $ICE_NY -comp_intf $COMP_INTERFACE \
+$CODEROOT/ice/cice/bld/configure -hgrid $ICE_GRID -ocomp $COMP_OCN -nx $ICE_NX -ny $ICE_NY -comp_intf $COMP_INTERFACE \
     -cice_mode $CICE_MODE -nodecomp $CICE_CONFIG_OPTS || exit -1
 
 if ($CICE_AUTO_DECOMP == 'true') then
