@@ -70,7 +70,7 @@
 #else
          snowpatch = 0.005_dbl_kind     ! parameter for fractional snow area (m)
 #endif
-         
+
       real (kind=real_kind), parameter :: &
          spval     = 1.0e30_real_kind   ! special value for netCDF output
 

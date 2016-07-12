@@ -336,7 +336,7 @@ if ($print>=2) { print "cice : nlon         is $nlon      $eol";}
 if ($print>=2) { print "cice : nlat         is $nlat      $eol";}
 
 #-----------------------------------------------------------------------------------------------
-# Ocean Component ##Alex
+# Ocean Component 
 my $ocomp;
 if (defined $opts{'ocomp'}) {
      $ocomp = $opts{'ocomp'};

@@ -17,7 +17,7 @@ module ice_comp_nuopc_mod
    use ESMF
    use NUOPC
    use NUOPC_Model, only: &
-      Model_routine_SetServices   => routine_SetServices, &
+      Model_routine_SetServices   => SetServices, &
       Model_label_Advance         => label_Advance
 
    use ice_comp_esmf
@@ -25,6 +25,8 @@ module ice_comp_nuopc_mod
    use esmfshr_nuopc_mod
    use seq_infodata_mod
    use shr_kind_mod,      only : SHR_KIND_R8
+   use perf_mod        , only: t_startf, t_stopf
+
 
    implicit none
 
@@ -54,16 +56,24 @@ contains
       file=__FILE__)) &
       return  ! bail out
 
-    ! set entry point for methods that require specific implementation
+    ! Provide InitializeP0 to switch from default IPDv00 to IPDv02
     call ESMF_GridCompSetEntryPoint(gcomp, ESMF_METHOD_INITIALIZE, &
-      userRoutine=InitializeP1, phase=1, rc=rc)
+      InitializeP0, phase=0, rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
       return  ! bail out
 
-    call ESMF_GridCompSetEntryPoint(gcomp, ESMF_METHOD_INITIALIZE, &
-      userRoutine=InitializeP2, phase=2, rc=rc)
+    ! set entry point for methods that require specific implementation
+    call NUOPC_CompSetEntryPoint(gcomp, ESMF_METHOD_INITIALIZE, &
+      phaseLabelList=(/"IPDv01p1"/), userRoutine=InitializeAdvertise, rc=rc)
+    if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
+      line=__LINE__, &
+      file=__FILE__)) &
+      return  ! bail out
+
+    call NUOPC_CompSetEntryPoint(gcomp, ESMF_METHOD_INITIALIZE, &
+      phaseLabelList=(/"IPDv01p3"/), userRoutine=InitializeRealize, rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
@@ -78,8 +88,8 @@ contains
       return  ! bail out
 
     ! Run routine to execute run functionality
-    call ESMF_GridCompSetEntryPoint(gcomp, ESMF_METHOD_RUN, &
-      userRoutine=routine_Run2, phase=2, rc=rc)
+    call NUOPC_CompSetEntryPoint(gcomp, ESMF_METHOD_RUN, &
+      userRoutine=routine_Run2, phaseLabelList=(/"RunPhase2"/), rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
@@ -87,9 +97,28 @@ contains
 
   end subroutine
 
+  subroutine InitializeP0(gcomp, importState, exportState, clock, rc)
+    type(ESMF_GridComp)   :: gcomp
+    type(ESMF_State)      :: importState, exportState
+    type(ESMF_Clock)      :: clock
+    integer, intent(out)  :: rc
+
+    rc = ESMF_SUCCESS
+
+    ! Switch to IPDv01 by filtering all other phaseMap entries
+    call NUOPC_CompFilterPhaseMap(gcomp, ESMF_METHOD_INITIALIZE, &
+      acceptStringList=(/"IPDv01p"/), rc=rc)
+    if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
+      line=__LINE__, &
+      file=__FILE__)) &
+      return  ! bail out
+
+  end subroutine
+
+
   !-----------------------------------------------------------------------------
 
-  subroutine InitializeP1(gcomp, importState, exportState, clock, rc)
+  subroutine InitializeAdvertise(gcomp, importState, exportState, clock, rc)
     type(ESMF_GridComp)  :: gcomp
     type(ESMF_State)     :: importState, exportState
     type(ESMF_Clock)     :: clock
@@ -119,7 +148,7 @@ contains
 
   !-----------------------------------------------------------------------------
 
-  subroutine InitializeP2(gcomp, importState, exportState, clock, rc)
+  subroutine InitializeRealize(gcomp, importState, exportState, clock, rc)
     type(ESMF_GridComp)  :: gcomp
     type(ESMF_State)     :: importState, exportState
     type(ESMF_Clock)     :: clock
@@ -204,6 +233,7 @@ contains
     logical            :: ice_present
     logical            :: icerun_alarm
 
+    call t_startf('MR_cice_MA1')
     rc = ESMF_SUCCESS
 
     ! query the Component for its clock, importState and exportState
@@ -214,20 +244,21 @@ contains
       file=__FILE__)) &
       return  ! bail out
 
-    call NUOPC_ClockPrintCurrTime(clock, &
-      "------>Advancing ICE from: ", rc=rc)
+!    call NUOPC_ClockPrintCurrTime(clock, &
+!      "------>Advancing ICE from: ", rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
       return  ! bail out
 
-    call NUOPC_ClockPrintStopTime(clock, &
-      "--------------------------------> to: ", rc=rc)
+!    call NUOPC_ClockPrintStopTime(clock, &
+!      "--------------------------------> to: ", rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
       return  ! bail out
 
+    call t_stopf('MR_cice_MA1')
   end subroutine
 
 
@@ -244,6 +275,7 @@ contains
     logical            :: ice_present
     logical            :: icerun_alarm
 
+    call t_startf('MR_cice_R2')
     rc = ESMF_SUCCESS
 
     ! query the Component for its clock, importState and exportState
@@ -286,6 +318,8 @@ contains
         file=__FILE__)) &
       return ! bail out
     end if
+
+    call t_stopf('MR_cice_R2')
 
   end subroutine
 

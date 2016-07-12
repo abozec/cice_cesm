@@ -17,6 +17,7 @@
 
 <xndt_dyn                   > 1.0 </xndt_dyn>
 <xndt_dyn hgrid="tx0.1v2"   > 3.0 </xndt_dyn>
+<xndt_dyn hgrid="gh08"      > 3.0 </xndt_dyn>
 
 <!--------------------------->
 <!-- grid_nml settings ------>
@@ -25,6 +26,7 @@
 <grid_type hgrid="tx0.1v2"  >'tripole'      </grid_type> 
 <grid_type hgrid="tx1v1"    >'tripole'      </grid_type> 
 <grid_type hgrid="gh72"     >'hycom'        </grid_type> 
+<grid_type hgrid="gh08"     >'hycom'        </grid_type>
 <grid_type                  >'displaced_pole'</grid_type> 
 
 <grid_format hgrid="tx0.1v2">'bin'</grid_format> 
@@ -38,7 +40,8 @@
 <grid_file hgrid="tx0.1v2"  >'ocn/pop/tx0.1v2/grid/horiz_grid_200709.ieeer8'</grid_file> 
 <grid_file hgrid="tx1v1"    >'ocn/pop/tx1v1/grid/horiz_grid_20050510.ieeer8'</grid_file>
 
-<grid_file hgrid="gh72"     >'../INPUT_glbt072/regional.cice.cesm.grid.500x381.r'</grid_file> 
+<grid_file hgrid="gh72"     >'ice/cice/regional.cice.cesm.grid.500x381.r'</grid_file> 
+<grid_file hgrid="gh08"     >'ice/cice/regional.cice.cesm.grid.4500x3297.r'</grid_file>
 
 <grid_file hgrid="ar9v1"     >'ice/cice/ar9v1_20090521.grid'       </grid_file>
 <grid_file hgrid="ar9v2"     >'ice/cice/ar9v1_20090521.grid'       </grid_file>
@@ -53,7 +56,8 @@
 <kmt_file hgrid="tx0.1v2"   >'ocn/pop/tx0.1v2/grid/topography_200709.ieeei4'</kmt_file> 
 <kmt_file hgrid="tx1v1"     >'ocn/pop/tx1v1/grid/topography_20050510.ieeei4'</kmt_file>
 
-<kmt_file hgrid="gh72"      >'../INPUT_glbt072/regional.cice.cesm.kmt.500x381.r'</kmt_file> 
+<kmt_file hgrid="gh72"      >'ice/cice/regional.cice.cesm.kmt.500x381.r'</kmt_file> 
+<kmt_file hgrid="gh08"      >'ice/cice/regional.cice.cesm.kmt.4500x3297.r'</kmt_file>
 
 <kmt_file hgrid="ar9v1"     >'ice/cice/ar9v1_20090520.kmt'       </kmt_file>
 <kmt_file hgrid="ar9v2"     >'ice/cice/ar9v1_20090520.kmt'       </kmt_file>
@@ -121,6 +125,7 @@
 
 <shortwave                 >'dEdd'</shortwave>
 <shortwave hgrid="tx0.1v2" >'default'</shortwave>
+<shortwave hgrid="gh08" >'default'</shortwave>
 
 <dT_mlt_in              > 1.50 </dT_mlt_in>
 <dT_mlt_in cam5='.true.'> 1.00 </dT_mlt_in>
@@ -165,6 +170,7 @@
 
 <tr_pond> .true. </tr_pond>
 <tr_pond hgrid='tx0.1v2' > .false. </tr_pond>
+<tr_pond hgrid='gh08' > .false. </tr_pond>
 
 <tr_aero> .true. </tr_aero>
 
@@ -188,6 +194,7 @@
 <ns_boundary_type hgrid ='tx0.1v2' >'tripole'</ns_boundary_type>
 <ns_boundary_type hgrid ='tx1v1'   >'tripole'</ns_boundary_type>
 <ns_boundary_type hgrid ='gh72'    >'tripole'</ns_boundary_type>
+<ns_boundary_type hgrid ='gh08'    >'tripole'</ns_boundary_type>
 <ns_boundary_type                  >'open'   </ns_boundary_type>
 
 <!-------------------------------------------------------------->
